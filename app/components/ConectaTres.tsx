@@ -117,14 +117,15 @@ export default function ConectaTres() {
     while ((m = findMatches(b)).size) {
       setClearing(m);
       await sleep(250);
-      gained += m.size * 10 * combo;
+      const points = m.size * 10 * combo;
+      gained += points;
       combo++;
       b = [...b];
       m.forEach((i) => (b[i] = null));
       setClearing(new Set());
       b = applyGravity(b);
       setBoard(b);
-      setScore((s) => s + m.size * 10 * (combo - 1));
+      setScore((s) => s + points);
       await sleep(200);
     }
     setMessage(combo > 2 ? `¡Combo x${combo - 1}! 🎉` : "");

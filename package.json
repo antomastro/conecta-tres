@@ -21,5 +21,13 @@
     "eslint-config-next": "16.4.2",
     "typescript": "^5"
   },
-  "packageManager": "pnpm@10.28.0"
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "sharp",
+      "unrs-resolver"
+    ]
+  }
 }
