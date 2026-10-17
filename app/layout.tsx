@@ -14,7 +14,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es">
+    // suppressHydrationWarning: extensiones como LanguageTool añaden atributos a <html>
+    <html lang="es" suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );
