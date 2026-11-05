@@ -14,6 +14,7 @@ import {
   type ModoTablero,
 } from "../lib/tresEnLinea";
 import { sonar } from "../lib/sonido";
+import { color, tablero as estiloTablero, type Apariencia } from "../lib/apariencia";
 import styles from "./TresEnLinea.module.css";
 
 export type Rival = "humano" | Dificultad;
@@ -22,11 +23,12 @@ interface Props {
   modo: ModoTablero;
   rival: Rival;
   sonido: boolean;
+  apariencia: Apariencia;
 }
 
 const RETARDO_IA = 450;
 
-export default function TresEnLinea({ modo, rival, sonido }: Props) {
+export default function TresEnLinea({ modo, rival, sonido, apariencia }: Props) {
   const cfg = CONFIGS[modo];
   const contraIA = rival !== "humano";
   const nombre = (j: Jugador) =>
@@ -118,7 +120,7 @@ export default function TresEnLinea({ modo, rival, sonido }: Props) {
       <div className={styles.estado} aria-live="polite">
         {!res && (
           <span
-            className={`${styles.punto} ${turno === 1 ? styles.azul : styles.rosa}`}
+            className={`${styles.punto} ${turno === 1 ? styles.j1 : styles.j2}`}
           />
         )}
         {estado}
@@ -126,6 +128,8 @@ export default function TresEnLinea({ modo, rival, sonido }: Props) {
 
       <div
         className={`${styles.tablero} ${cfg.gravedad ? styles.gravedad : ""}`}
+        data-forma={apariencia.forma}
+        data-huecos={estiloTablero(apariencia.tablero).redondos ? "redondos" : undefined}
         style={{ gridTemplateColumns: `repeat(${cfg.cols}, 1fr)` }}
       >
         {tablero.map((v, i) => {
@@ -143,7 +147,7 @@ export default function TresEnLinea({ modo, rival, sonido }: Props) {
             >
               {v !== 0 && (
                 <span
-                  className={`${styles.ficha} ${v === 1 ? styles.azul : styles.rosa} ${
+                  className={`${styles.ficha} ${v === 1 ? styles.j1 : styles.j2} ${
                     i === ultima ? (cfg.gravedad ? styles.cae : styles.aparece) : ""
                   }`}
                   style={
@@ -157,13 +161,15 @@ export default function TresEnLinea({ modo, rival, sonido }: Props) {
       </div>
 
       <div className={styles.marcador}>
-        <div className={turno === 1 && !res ? styles.activo : ""}>
-          <small>Jugador 1 · Azul</small>
-          <b className={styles.textoAzul}>{marcador.j1}</b>
+        <div className={turno === 1 && !res ? styles.activo1 : ""}>
+          <small>Jugador 1 · {color(apariencia.color1).nombre}</small>
+          <b className={styles.texto1}>{marcador.j1}</b>
         </div>
-        <div className={turno === 2 && !res ? styles.activo : ""}>
-          <small>{nombre(2)} · Rosa</small>
-          <b className={styles.textoRosa}>{marcador.j2}</b>
+        <div className={turno === 2 && !res ? styles.activo2 : ""}>
+          <small>
+            {nombre(2)} · {color(apariencia.color2).nombre}
+          </small>
+          <b className={styles.texto2}>{marcador.j2}</b>
         </div>
         <div>
           <small>Empates</small>

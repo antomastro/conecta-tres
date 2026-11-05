@@ -24,14 +24,24 @@
   border-radius: 50%;
 }
 
-.azul {
-  background: radial-gradient(circle at 35% 30%, #a5f3fc, var(--azul) 55%, #0e7490);
-  box-shadow: 0 0 14px color-mix(in srgb, var(--azul) 60%, transparent);
+/* Colores elegidos en Personalizar (--c1 y --c2), con brillo y sombra calculados. */
+.j1 {
+  --c: var(--c1);
 }
 
-.rosa {
-  background: radial-gradient(circle at 35% 30%, #fbcfe8, var(--rosa) 55%, #9d174d);
-  box-shadow: 0 0 14px color-mix(in srgb, var(--rosa) 60%, transparent);
+.j2 {
+  --c: var(--c2);
+}
+
+.j1,
+.j2 {
+  background: radial-gradient(
+    circle at 35% 30%,
+    color-mix(in srgb, var(--c) 45%, white),
+    var(--c) 55%,
+    color-mix(in srgb, var(--c) 55%, black)
+  );
+  box-shadow: 0 0 14px color-mix(in srgb, var(--c) 60%, transparent);
 }
 
 .tablero {
@@ -40,8 +50,8 @@
   width: min(100%, 340px);
   padding: 12px;
   border-radius: 18px;
-  background: var(--card);
-  border: 1px solid var(--borde);
+  background: var(--tablero-fondo);
+  border: 1px solid var(--tablero-borde);
   /* Las fichas que caen no deben verse por encima del tablero. */
   overflow: hidden;
 }
@@ -53,7 +63,7 @@
 .casilla {
   position: relative;
   aspect-ratio: 1;
-  border: 1px solid var(--borde);
+  border: 1px solid var(--tablero-borde);
   border-radius: 12px;
   background: var(--hueco);
   padding: 0;
@@ -65,7 +75,7 @@
 
 .casilla:hover:not(:disabled) {
   background: var(--hueco-hover);
-  border-color: color-mix(in srgb, var(--azul) 40%, var(--borde));
+  border-color: color-mix(in srgb, var(--c1) 50%, var(--tablero-borde));
 }
 
 .casilla:disabled {
@@ -75,6 +85,45 @@
 .ficha {
   position: absolute;
   inset: 14%;
+  border-radius: 50%;
+}
+
+/* Formas de ficha. */
+[data-forma="cuadrado"] .ficha {
+  border-radius: 22%;
+}
+
+[data-forma="rombo"] .ficha {
+  inset: 10%;
+  border-radius: 0;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+[data-forma="hexagono"] .ficha {
+  inset: 11%;
+  border-radius: 0;
+  clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0 50%);
+}
+
+[data-forma="estrella"] .ficha {
+  inset: 8%;
+  border-radius: 0;
+  clip-path: polygon(
+    50% 0,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
+}
+
+/* Tableros con huecos redondos, como el clásico de fichas. */
+[data-huecos="redondos"] .casilla {
   border-radius: 50%;
 }
 
@@ -124,9 +173,14 @@
   text-align: center;
 }
 
-.marcador .activo {
-  border-color: var(--azul);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--azul) 30%, transparent);
+.marcador .activo1 {
+  border-color: var(--c1);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--c1) 30%, transparent);
+}
+
+.marcador .activo2 {
+  border-color: var(--c2);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--c2) 30%, transparent);
 }
 
 .marcador small {
@@ -138,12 +192,12 @@
   font-size: 1.5rem;
 }
 
-.textoAzul {
-  color: var(--azul);
+.texto1 {
+  color: var(--c1);
 }
 
-.textoRosa {
-  color: var(--rosa);
+.texto2 {
+  color: var(--c2);
 }
 
 .textoAmbar {

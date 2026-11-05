@@ -1,8 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ConectaTres from "./ConectaTres";
+import Personalizar from "./Personalizar";
 import TresEnLinea, { type Rival } from "./TresEnLinea";
+import {
+  APARIENCIA_INICIAL,
+  cargarApariencia,
+  guardarApariencia,
+  variables,
+  type Apariencia,
+} from "../lib/apariencia";
 import styles from "./Arcade.module.css";
 
 type Modo = "clasico" | "gravedad" | "frutas";
@@ -23,10 +31,23 @@ export default function Arcade() {
   const [modo, setModo] = useState<Modo>("clasico");
   const [rival, setRival] = useState<Rival>("facil");
   const [sonido, setSonido] = useState(true);
+  const [apariencia, setApariencia] = useState<Apariencia>(APARIENCIA_INICIAL);
   const frutas = modo === "frutas";
 
+  // La apariencia guardada solo existe en el navegador: se lee tras montar
+  // para que el HTML del servidor y el del cliente coincidan.
+  useEffect(() => {
+    const t = setTimeout(() => setApariencia(cargarApariencia()), 0);
+    return () => clearTimeout(t);
+  }, []);
+
+  function cambiarApariencia(a: Apariencia) {
+    setApariencia(a);
+    guardarApariencia(a);
+  }
+
   return (
-    <main className={styles.arcade}>
+    <main className={styles.arcade} style={variables(apariencia)}>
       <header className={styles.cabecera}>
         <p className={styles.antetitulo}>Arcade · Estrategia</p>
         <h1>
@@ -75,11 +96,24 @@ export default function Arcade() {
           </button>
         </div>
 
+        <Personalizar
+          apariencia={apariencia}
+          cambiar={cambiarApariencia}
+          conFichas={!frutas}
+          nombreJ2={rival === "humano" ? "Jugador 2" : "IA"}
+        />
+
         {frutas ? (
           <ConectaTres sonido={sonido} />
         ) : (
           // La key reinicia tablero y marcador al cambiar de modo o de rival.
-          <TresEnLinea key={`${modo}-${rival}`} modo={modo} rival={rival} sonido={sonido} />
+          <TresEnLinea
+            key={`${modo}-${rival}`}
+            modo={modo}
+            rival={rival}
+            sonido={sonido}
+            apariencia={apariencia}
+          />
         )}
       </section>
 

@@ -31,7 +31,8 @@
   grid-template-columns: repeat(8, 1fr);
   gap: 3px;
   width: min(100%, 440px);
-  background: var(--card);
+  background: var(--tablero-fondo);
+  border: 1px solid var(--tablero-borde);
   padding: 6px;
   border-radius: 14px;
   box-sizing: border-box;
@@ -41,7 +42,7 @@
   aspect-ratio: 1;
   border: 0;
   border-radius: 10px;
-  background: var(--background);
+  background: var(--hueco);
   font-size: min(7vw, 32px);
   cursor: pointer;
   padding: 0;
