@@ -189,3 +189,72 @@ export function movimientoIA(t: Ficha[], cfg: Config, yo: Jugador, dif: Dificult
   }
   return mejor;
 }
+
+// --- Partida completa (lo que se sincroniza entre dos móviles) ---
+
+export interface Marcador {
+  j1: number;
+  j2: number;
+  empates: number;
+}
+
+export interface Partida {
+  modo: ModoTablero;
+  tablero: Ficha[];
+  turno: Jugador;
+  empieza: Jugador; // quién empezó esta partida; se alterna en cada una
+  ultima: number; // última casilla jugada, para animarla
+  marcador: Marcador;
+  // Al sincronizar gana la época más alta (sube al cambiar de modo) y, dentro
+  // de la misma época, la versión más alta (sube con cada jugada o reinicio).
+  epoca: number;
+  v: number;
+}
+
+export function partidaNueva(modo: ModoTablero, epoca = 0): Partida {
+  return {
+    modo,
+    tablero: tableroVacio(CONFIGS[modo]),
+    turno: 1,
+    empieza: 1,
+    ultima: -1,
+    marcador: { j1: 0, j2: 0, empates: 0 },
+    epoca,
+    v: 0,
+  };
+}
+
+export function masNueva(a: Partida, b: Partida): boolean {
+  return a.epoca > b.epoca || (a.epoca === b.epoca && a.v > b.v);
+}
+
+export function conJugada(p: Partida, casilla: number, j: Jugador): Partida {
+  const cfg = CONFIGS[p.modo];
+  const tablero = jugar(p.tablero, casilla, j);
+  const r = resultado(tablero, cfg);
+  const m = p.marcador;
+  const marcador = !r
+    ? m
+    : r.ganador === 0
+      ? { ...m, empates: m.empates + 1 }
+      : r.ganador === 1
+        ? { ...m, j1: m.j1 + 1 }
+        : { ...m, j2: m.j2 + 1 };
+  return { ...p, tablero, ultima: casilla, turno: r ? p.turno : otro(j), marcador, v: p.v + 1 };
+}
+
+export function siguientePartida(p: Partida): Partida {
+  const empieza = otro(p.empieza);
+  return {
+    ...p,
+    tablero: tableroVacio(CONFIGS[p.modo]),
+    turno: empieza,
+    empieza,
+    ultima: -1,
+    v: p.v + 1,
+  };
+}
+
+export function marcadorACero(p: Partida): Partida {
+  return { ...partidaNueva(p.modo, p.epoca), v: p.v + 1 };
+}

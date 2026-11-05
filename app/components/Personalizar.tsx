@@ -16,10 +16,11 @@ interface Props {
   cambiar: (a: Apariencia) => void;
   // En el modo frutas solo tiene sentido elegir el tablero.
   conFichas: boolean;
-  nombreJ2: string;
+  titulo1: string;
+  titulo2: string;
 }
 
-export default function Personalizar({ apariencia: a, cambiar, conFichas, nombreJ2 }: Props) {
+export default function Personalizar({ apariencia: a, cambiar, conFichas, titulo1, titulo2 }: Props) {
   function paleta(jugador: "color1" | "color2", titulo: string) {
     const elOtro = jugador === "color1" ? a.color2 : a.color1;
     return (
@@ -76,8 +77,8 @@ export default function Personalizar({ apariencia: a, cambiar, conFichas, nombre
             ))}
           </select>
         </label>
-        {conFichas && paleta("color1", "Color Jugador 1")}
-        {conFichas && paleta("color2", `Color ${nombreJ2}`)}
+        {conFichas && paleta("color1", titulo1)}
+        {conFichas && paleta("color2", titulo2)}
       </div>
     </details>
   );

@@ -1,0 +1,117 @@
+.sala {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--c1) 40%, var(--borde));
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.texto {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--tenue);
+}
+
+.texto b {
+  color: var(--foreground);
+}
+
+.etiqueta {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tenue);
+}
+
+.codigo {
+  font-size: 1.8rem;
+  letter-spacing: 0.2em;
+  color: var(--c1);
+}
+
+.unirse {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.unirse input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--borde);
+  background: var(--panel);
+  color: var(--foreground);
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.principal,
+.secundario {
+  flex: 1;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.principal {
+  border: 0;
+  color: #04202a;
+  background: linear-gradient(135deg, #67e8f9, var(--azul));
+}
+
+.secundario {
+  flex: 0 0 auto;
+  border: 1px solid var(--borde);
+  color: var(--foreground);
+  background: var(--panel);
+}
+
+.secundario:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.conexion {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid var(--borde);
+}
+
+.listo {
+  color: #4ade80;
+  border-color: #4ade80;
+}
+
+.esperando,
+.conectando {
+  color: var(--ambar);
+  border-color: var(--ambar);
+}
+
+.lleno,
+.error {
+  color: #f87171;
+  border-color: #f87171;
+}
