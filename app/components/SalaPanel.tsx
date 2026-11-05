@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { enLineaDisponible, normalizarCodigo, type Sala } from "../lib/sala";
+import { useTextos } from "../lib/i18n";
 import styles from "./SalaPanel.module.css";
 
 interface Props {
@@ -11,22 +12,15 @@ interface Props {
   salir: () => void;
 }
 
-const TEXTO_CONEXION = {
-  conectando: "Conectando…",
-  esperando: "Esperando rival",
-  listo: "Rival conectado",
-  lleno: "Sala llena",
-  error: "Sin conexión",
-} as const;
-
 export default function SalaPanel({ sala, crear, unirse, salir }: Props) {
+  const t = useTextos();
   const [codigo, setCodigo] = useState("");
   const [aviso, setAviso] = useState("");
 
   if (!enLineaDisponible) {
     return (
       <div className={styles.sala}>
-        <p className={styles.texto}>El juego en línea no está configurado en este servidor.</p>
+        <p className={styles.texto}>{t.sinConfigurar}</p>
       </div>
     );
   }
@@ -35,11 +29,11 @@ export default function SalaPanel({ sala, crear, unirse, salir }: Props) {
     return (
       <div className={styles.sala}>
         <p className={styles.texto}>
-          📱 Juega desde dos móviles: uno crea la sala y el otro se une con el código.
+          {t.comoJugarLinea}
         </p>
         <div className={styles.fila}>
           <button type="button" className={styles.principal} onClick={crear}>
-            Crear sala
+            {t.crearSala}
           </button>
           <form
             className={styles.unirse}
@@ -51,14 +45,14 @@ export default function SalaPanel({ sala, crear, unirse, salir }: Props) {
             <input
               value={codigo}
               onChange={(e) => setCodigo(normalizarCodigo(e.target.value))}
-              placeholder="CÓDIGO"
-              aria-label="Código de la sala"
+              placeholder={t.codigo}
+              aria-label={t.codigoSala}
               autoCapitalize="characters"
               autoComplete="off"
               inputMode="text"
             />
             <button type="submit" className={styles.secundario} disabled={codigo.length !== 4}>
-              Unirse
+              {t.unirse}
             </button>
           </form>
         </div>
@@ -72,12 +66,12 @@ export default function SalaPanel({ sala, crear, unirse, salir }: Props) {
       : `${window.location.origin}${window.location.pathname}?sala=${sala.codigo}`;
 
   async function compartir() {
-    const datos = { title: "Conecta Tres", text: "¡Juega conmigo a Conecta Tres!", url: enlace };
+    const datos = { title: "Conecta Tres", text: t.invitacion, url: enlace };
     try {
       if (navigator.share) await navigator.share(datos);
       else {
         await navigator.clipboard.writeText(enlace);
-        setAviso("Enlace copiado ✔");
+        setAviso(t.enlaceCopiado);
       }
     } catch {
       /* el usuario canceló o no hay portapapeles */
@@ -88,23 +82,22 @@ export default function SalaPanel({ sala, crear, unirse, salir }: Props) {
     <div className={styles.sala}>
       <div className={styles.fila}>
         <div>
-          <small className={styles.etiqueta}>Sala</small>
+          <small className={styles.etiqueta}>{t.sala}</small>
           <b className={styles.codigo}>{sala.codigo}</b>
         </div>
         <span className={`${styles.conexion} ${styles[sala.conexion]}`}>
-          {TEXTO_CONEXION[sala.conexion]}
+          {t.conexion[sala.conexion]}
         </span>
       </div>
       <p className={styles.texto}>
-        Eres el <b>Jugador {sala.soy}</b>.{" "}
-        {sala.conexion === "esperando" && "Pasa el código o el enlace a tu rival."}
+        <b>{t.eresJugador(sala.soy)}</b> {sala.conexion === "esperando" && t.pasaCodigo}
       </p>
       <div className={styles.fila}>
         <button type="button" className={styles.principal} onClick={compartir}>
-          Compartir enlace
+          {t.compartirEnlace}
         </button>
         <button type="button" className={styles.secundario} onClick={salir}>
-          Salir de la sala
+          {t.salirSala}
         </button>
       </div>
       {aviso && <p className={styles.texto}>{aviso}</p>}

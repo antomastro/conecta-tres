@@ -13,23 +13,21 @@ import {
   type Apariencia,
 } from "../lib/apariencia";
 import { codigoNuevo, normalizarCodigo, useSala } from "../lib/sala";
+import {
+  IDIOMAS,
+  TextosContext,
+  guardarIdioma,
+  idiomaInicial,
+  textosDe,
+  type Idioma,
+} from "../lib/i18n";
 import type { Jugador, Partida } from "../lib/tresEnLinea";
 import styles from "./Arcade.module.css";
 
 type Modo = "clasico" | "gravedad" | "frutas";
 
-const MODOS: { id: Modo; texto: string }[] = [
-  { id: "clasico", texto: "Modo Clásico · 3 × 3" },
-  { id: "gravedad", texto: "Modo Gravedad · 5 × 4" },
-  { id: "frutas", texto: "Modo Frutas · combina 3" },
-];
-
-const RIVALES: { id: Rival; texto: string }[] = [
-  { id: "facil", texto: "IA · fácil" },
-  { id: "dificil", texto: "IA · difícil" },
-  { id: "humano", texto: "2 jugadores · este móvil" },
-  { id: "linea", texto: "En línea · 2 móviles" },
-];
+const MODOS: Modo[] = ["clasico", "gravedad", "frutas"];
+const RIVALES: Rival[] = ["facil", "dificil", "humano", "linea"];
 
 // Quien crea la sala es el Jugador 1; se recuerda por si recarga la página.
 const claveRol = (codigo: string) => `c3sala-${codigo}`;
@@ -46,6 +44,8 @@ export default function Arcade() {
   const [rival, setRival] = useState<Rival>("facil");
   const [sonido, setSonido] = useState(true);
   const [apariencia, setApariencia] = useState<Apariencia>(APARIENCIA_INICIAL);
+  const [idioma, setIdioma] = useState<Idioma>("es");
+  const t = textosDe(idioma);
   const [codigo, setCodigo] = useState<string | null>(null);
   const [soy, setSoy] = useState<Jugador>(1);
   const [inicial, setInicial] = useState<Partida | null>(null);
@@ -59,6 +59,7 @@ export default function Arcade() {
   useEffect(() => {
     const t = setTimeout(() => {
       setApariencia(cargarApariencia());
+      setIdioma(idiomaInicial());
       const deUrl = normalizarCodigo(new URLSearchParams(window.location.search).get("sala") ?? "");
       if (deUrl.length === 4) {
         let rol: Jugador = 2;
@@ -74,6 +75,16 @@ export default function Arcade() {
     }, 0);
     return () => clearTimeout(t);
   }, []);
+
+  // Así lectores de pantalla y traductores del navegador saben el idioma.
+  useEffect(() => {
+    document.documentElement.lang = idioma;
+  }, [idioma]);
+
+  function cambiarIdioma(id: Idioma) {
+    setIdioma(id);
+    guardarIdioma(id);
+  }
 
   function cambiarApariencia(a: Apariencia) {
     setApariencia(a);
@@ -120,40 +131,41 @@ export default function Arcade() {
   }, []);
 
   return (
+    <TextosContext.Provider value={t}>
     <main className={styles.arcade} style={variables(apariencia)}>
       <header className={styles.cabecera}>
-        <p className={styles.antetitulo}>Arcade · Estrategia</p>
+        <p className={styles.antetitulo}>{t.antetitulo}</p>
         <h1>
           Conecta <span>Tres</span>
         </h1>
-        <p className={styles.lema}>Tres fichas en línea. Una partida puede cambiarlo todo.</p>
+        <p className={styles.lema}>{t.lema}</p>
       </header>
 
       <section className={styles.panel}>
         <div className={styles.opciones}>
           <label>
-            <span>Modo de tablero</span>
+            <span>{t.modoTablero}</span>
             <select value={modo} onChange={(e) => cambiarModo(e.target.value as Modo)}>
               {MODOS.map((m) => (
-                <option key={m.id} value={m.id} disabled={m.id === "frutas" && rival === "linea"}>
-                  {m.texto}
+                <option key={m} value={m} disabled={m === "frutas" && rival === "linea"}>
+                  {t.modos[m]}
                 </option>
               ))}
             </select>
           </label>
           <label>
-            <span>Rival</span>
+            <span>{t.rival}</span>
             <select
               value={frutas ? "solo" : rival}
               disabled={frutas}
               onChange={(e) => cambiarRival(e.target.value as Rival)}
             >
               {frutas ? (
-                <option value="solo">Solitario</option>
+                <option value="solo">{t.solitario}</option>
               ) : (
                 RIVALES.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.texto}
+                  <option key={r} value={r}>
+                    {t.rivales[r]}
                   </option>
                 ))
               )}
@@ -165,8 +177,18 @@ export default function Arcade() {
             onClick={() => setSonido((s) => !s)}
             aria-pressed={sonido}
           >
-            {sonido ? "🔊 Sonido: sí" : "🔇 Sonido: no"}
+            {sonido ? t.sonidoSi : t.sonidoNo}
           </button>
+          <label className={styles.idioma}>
+            <span>🌐 {t.idioma}</span>
+            <select value={idioma} onChange={(e) => cambiarIdioma(e.target.value as Idioma)}>
+              {IDIOMAS.map((i) => (
+                <option key={i.id} value={i.id}>
+                  {i.nombre}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
         {enLinea && (
@@ -182,10 +204,8 @@ export default function Arcade() {
           apariencia={apariencia}
           cambiar={cambiarApariencia}
           conFichas={!frutas}
-          titulo1={enLinea ? "Color de tus fichas" : "Color Jugador 1"}
-          titulo2={
-            enLinea ? "Color del rival" : rival === "humano" ? "Color Jugador 2" : "Color IA"
-          }
+          titulo1={enLinea ? t.colorTuyas : t.colorJ1}
+          titulo2={enLinea ? t.colorRival : rival === "humano" ? t.colorJ2 : t.colorIA}
         />
 
         {frutas ? (
@@ -207,10 +227,9 @@ export default function Arcade() {
       </section>
 
       <p className={styles.pie}>
-        {enLinea
-          ? "Las jugadas viajan en tiempo real entre los dos móviles"
-          : "Funciona sin conexión · El sonido se genera en tu navegador"}
+        {enLinea ? t.pieLinea : t.pieLocal}
       </p>
     </main>
+    </TextosContext.Provider>
   );
 }

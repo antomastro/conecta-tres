@@ -18,7 +18,8 @@ import {
   type Partida,
 } from "../lib/tresEnLinea";
 import { sonar, type Efecto } from "../lib/sonido";
-import { color, tablero as estiloTablero, type Apariencia } from "../lib/apariencia";
+import { tablero as estiloTablero, type Apariencia } from "../lib/apariencia";
+import { useTextos } from "../lib/i18n";
 import type { Sala } from "../lib/sala";
 import styles from "./TresEnLinea.module.css";
 
@@ -48,6 +49,7 @@ export default function TresEnLinea({
   anunciar = false,
   onModoRemoto,
 }: Props) {
+  const t = useTextos();
   const enLinea = rival === "linea";
   const contraIA = rival === "facil" || rival === "dificil";
   const soy: Jugador = sala?.soy ?? 1;
@@ -69,12 +71,11 @@ export default function TresEnLinea({
   const puedoJugar = !res && !turnoIA && (!enLinea || (conectado && p.turno === soy));
 
   const nombre = (j: Jugador) =>
-    enLinea ? (j === soy ? "Tú" : "Rival") : j === 1 ? "Jugador 1" : contraIA ? "IA" : "Jugador 2";
+    enLinea ? (j === soy ? t.tu : t.elRival) : j === 1 ? t.jugador1 : contraIA ? t.ia : t.jugador2;
   // En línea, "color 1" son siempre tus fichas y "color 2" las del rival.
   const usaColor1 = (j: Jugador) => (enLinea ? j === soy : j === 1);
   const claseFicha = (j: Jugador) => (usaColor1(j) ? styles.j1 : styles.j2);
-  const nombreColor = (j: Jugador) =>
-    color(usaColor1(j) ? apariencia.color1 : apariencia.color2).nombre;
+  const nombreColor = (j: Jugador) => t.colores[usaColor1(j) ? apariencia.color1 : apariencia.color2];
 
   const sonidoTras = useCallback(
     (sig: Partida, autor: Jugador) => {
@@ -161,16 +162,16 @@ export default function TresEnLinea({
   }
 
   let estado: string;
-  if (enLinea && sala?.conexion === "conectando") estado = "Conectando con la sala…";
-  else if (enLinea && sala?.conexion === "esperando") estado = "Esperando a tu rival…";
-  else if (enLinea && sala?.conexion === "lleno") estado = "Esta sala ya tiene dos jugadores";
-  else if (enLinea && sala?.conexion === "error") estado = "No se pudo conectar a la sala";
-  else if (res?.ganador === 0) estado = "¡Empate!";
-  else if (res && enLinea) estado = res.ganador === soy ? "¡Ganaste! 🎉" : "Ganó tu rival";
-  else if (res) estado = `¡Gana ${nombre(res.ganador)}! 🎉`;
-  else if (turnoIA) estado = "La IA está pensando…";
-  else if (enLinea) estado = p.turno === soy ? "Tu turno" : "Turno del rival…";
-  else estado = `Turno de ${nombre(p.turno)}`;
+  if (enLinea && sala?.conexion === "conectando") estado = t.conectando;
+  else if (enLinea && sala?.conexion === "esperando") estado = t.esperandoRival;
+  else if (enLinea && sala?.conexion === "lleno") estado = t.salaLlena;
+  else if (enLinea && sala?.conexion === "error") estado = t.errorSala;
+  else if (res?.ganador === 0) estado = t.empate;
+  else if (res && enLinea) estado = res.ganador === soy ? t.ganaste : t.ganoRival;
+  else if (res) estado = t.gana(nombre(res.ganador));
+  else if (turnoIA) estado = t.iaPiensa;
+  else if (enLinea) estado = p.turno === soy ? t.tuTurno : t.turnoRival;
+  else estado = t.turnoDe(nombre(p.turno));
 
   const ganadoras = new Set(res?.linea ?? []);
   const verTurno = !res && (!enLinea || conectado);
@@ -197,7 +198,7 @@ export default function TresEnLinea({
               className={`${styles.casilla} ${ganadoras.has(i) ? styles.ganadora : ""}`}
               onClick={() => tocar(i)}
               disabled={!puedoJugar}
-              aria-label={`Fila ${fila + 1}, columna ${(i % cfg.cols) + 1}${
+              aria-label={`${t.casilla(fila + 1, (i % cfg.cols) + 1)}${
                 v ? `: ${nombre(v as Jugador)}` : ""
               }`}
             >
@@ -233,7 +234,7 @@ export default function TresEnLinea({
           </div>
         ))}
         <div>
-          <small>Empates</small>
+          <small>{t.empates}</small>
           <b className={styles.textoAmbar}>{p.marcador.empates}</b>
         </div>
       </div>
@@ -244,21 +245,19 @@ export default function TresEnLinea({
           className={styles.principal}
           onClick={() => aplicar(siguientePartida(actual.current))}
         >
-          ↻ Nueva partida
+          {t.nuevaPartida}
         </button>
         <button
           type="button"
           className={styles.secundario}
           onClick={() => aplicar(marcadorACero(actual.current))}
         >
-          Reiniciar marcador
+          {t.reiniciarMarcador}
         </button>
       </div>
 
       <p className={styles.ayuda}>
-        {cfg.gravedad
-          ? "💡 Modo Gravedad (5×4): toca una columna y la ficha cae hasta el fondo. ¡Alinea 3!"
-          : "💡 Modo Clásico (3×3): toca cualquier casilla libre. ¡Alinea 3 en horizontal, vertical o diagonal!"}
+        {cfg.gravedad ? t.ayudaGravedad : t.ayudaClasico}
       </p>
     </div>
   );

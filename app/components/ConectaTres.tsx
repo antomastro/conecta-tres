@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { sonar } from "../lib/sonido";
+import { useTextos, type Textos } from "../lib/i18n";
 import styles from "./ConectaTres.module.css";
 
 const N = 8;
@@ -73,9 +74,33 @@ const isAdjacent = (a: number, c: number) =>
     Math.abs((a % N) - (c % N)) ===
   1;
 
-const INTRO = "Toca una fruta y luego una vecina para intercambiarlas.";
+// Se guarda qué mensaje mostrar, no el texto, para que cambie con el idioma.
+type Mensaje =
+  | { tipo: "intro" }
+  | { tipo: "ninguno" }
+  | { tipo: "noConecta" }
+  | { tipo: "combo"; n: number }
+  | { tipo: "fin"; puntos: number };
+
+const INTRO: Mensaje = { tipo: "intro" };
+
+function textoMensaje(m: Mensaje, t: Textos): string {
+  switch (m.tipo) {
+    case "intro":
+      return t.introFrutas;
+    case "noConecta":
+      return t.noConecta;
+    case "combo":
+      return t.combo(m.n);
+    case "fin":
+      return t.finJuego(m.puntos);
+    default:
+      return "";
+  }
+}
 
 export default function ConectaTres({ sonido }: { sonido: boolean }) {
+  const t = useTextos();
   // El tablero se crea en el cliente (useEffect) para evitar diferencias
   // entre servidor y navegador por el uso de números aleatorios.
   const [board, setBoard] = useState<Board>([]);
@@ -84,7 +109,7 @@ export default function ConectaTres({ sonido }: { sonido: boolean }) {
   const [score, setScore] = useState(0);
   const [moves, setMoves] = useState(INITIAL_MOVES);
   const [best, setBest] = useState(0);
-  const [message, setMessage] = useState(INTRO);
+  const [message, setMessage] = useState<Mensaje>(INTRO);
   const busy = useRef(false);
   const over = useRef(false);
 
@@ -106,8 +131,8 @@ export default function ConectaTres({ sonido }: { sonido: boolean }) {
 
   useEffect(() => {
     // Se difiere un instante: el tablero aleatorio solo existe en el cliente.
-    const t = setTimeout(reset, 0);
-    return () => clearTimeout(t);
+    const id = setTimeout(reset, 0);
+    return () => clearTimeout(id);
   }, [reset]);
 
   async function resolveBoard(start: Board): Promise<number> {
@@ -130,7 +155,7 @@ export default function ConectaTres({ sonido }: { sonido: boolean }) {
       setScore((s) => s + points);
       await sleep(200);
     }
-    setMessage(combo > 2 ? `¡Combo x${combo - 1}! 🎉` : "");
+    setMessage(combo > 2 ? { tipo: "combo", n: combo - 1 } : { tipo: "ninguno" });
     return gained;
   }
 
@@ -144,7 +169,7 @@ export default function ConectaTres({ sonido }: { sonido: boolean }) {
 
     if (!findMatches(swapped).size) {
       setBoard(board);
-      setMessage("Ese movimiento no conecta tres.");
+      setMessage({ tipo: "noConecta" });
       busy.current = false;
       return;
     }
@@ -164,7 +189,7 @@ export default function ConectaTres({ sonido }: { sonido: boolean }) {
     }
     if (remaining <= 0) {
       over.current = true;
-      setMessage(`¡Fin del juego! Puntos: ${total} 🏆`);
+      setMessage({ tipo: "fin", puntos: total });
     }
     busy.current = false;
   }
@@ -181,13 +206,16 @@ export default function ConectaTres({ sonido }: { sonido: boolean }) {
     <div className={styles.wrap}>
       <div className={styles.hud}>
         <div>
-          Puntos<b>{score}</b>
+          {t.puntos}
+          <b>{score}</b>
         </div>
         <div>
-          Movimientos<b>{moves}</b>
+          {t.movimientos}
+          <b>{moves}</b>
         </div>
         <div>
-          Récord<b>{best}</b>
+          {t.record}
+          <b>{best}</b>
         </div>
       </div>
       <div className={styles.grid}>
@@ -195,7 +223,7 @@ export default function ConectaTres({ sonido }: { sonido: boolean }) {
           <button
             key={i}
             type="button"
-            aria-label={v == null ? "vacío" : `casilla ${i + 1}`}
+            aria-label={v == null ? t.vacio : t.casillaN(i + 1)}
             className={`${styles.tile} ${i === selected ? styles.sel : ""} ${
               clearing.has(i) ? styles.pop : ""
             }`}
@@ -206,10 +234,10 @@ export default function ConectaTres({ sonido }: { sonido: boolean }) {
         ))}
       </div>
       <p className={styles.msg} aria-live="polite">
-        {message}
+        {textoMensaje(message, t)}
       </p>
       <button type="button" className={styles.new} onClick={reset}>
-        Nuevo juego
+        {t.nuevoJuego}
       </button>
     </div>
   );
