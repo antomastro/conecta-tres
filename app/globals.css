@@ -1,19 +1,19 @@
+/* Tema arcade oscuro: azul (jugador 1), rosa (jugador 2 / IA) y ámbar (empates). */
 :root {
-  --background: #fdf6ee;
-  --foreground: #3b2f2f;
-  --card: #ffffff;
-  --accent: #e86a4a;
-  --sel: #ffd9a0;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1e1a1a;
-    --foreground: #f3e9e9;
-    --card: #2c2626;
-    --accent: #ff8a6b;
-    --sel: #6b4a2a;
-  }
+  color-scheme: dark;
+  --background: #070b17;
+  --foreground: #e6edf7;
+  --tenue: #93a3bd;
+  --panel: #0e1526;
+  --card: #141d33;
+  --hueco: #0a1020;
+  --hueco-hover: #131d36;
+  --borde: #25324f;
+  --azul: #22d3ee;
+  --rosa: #f472b6;
+  --ambar: #fbbf24;
+  --accent: #22d3ee;
+  --sel: #1f4b63;
 }
 
 * {
@@ -27,7 +27,11 @@ body {
 }
 
 body {
-  background: var(--background);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 15% 0%, rgb(34 211 238 / 0.12), transparent 40%),
+    radial-gradient(circle at 85% 100%, rgb(244 114 182 / 0.1), transparent 45%),
+    var(--background);
   color: var(--foreground);
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }

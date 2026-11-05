@@ -1,0 +1,118 @@
+.arcade {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding: 28px 16px 24px;
+}
+
+.cabecera {
+  text-align: center;
+}
+
+.antetitulo {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--azul);
+}
+
+.cabecera h1 {
+  margin: 6px 0;
+  font-size: clamp(2.2rem, 9vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 24px rgb(255 255 255 / 0.15);
+}
+
+.cabecera h1 span {
+  color: var(--azul);
+  text-shadow: 0 0 22px color-mix(in srgb, var(--azul) 60%, transparent);
+}
+
+.lema {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--tenue);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  box-shadow: 0 20px 50px rgb(0 0 0 / 0.35);
+}
+
+.opciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: end;
+}
+
+.opciones label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.opciones label span {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tenue);
+}
+
+.opciones select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--borde);
+  background: var(--card);
+  color: var(--foreground);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.opciones select:focus-visible {
+  outline: 2px solid var(--azul);
+  outline-offset: 1px;
+}
+
+.opciones select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.sonido {
+  grid-column: 1 / -1;
+  justify-self: start;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--borde);
+  background: var(--card);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pie {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--tenue);
+  text-align: center;
+}

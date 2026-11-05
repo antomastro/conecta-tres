@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { sonar } from "../lib/sonido";
 import styles from "./ConectaTres.module.css";
 
 const N = 8;
@@ -74,7 +75,7 @@ const isAdjacent = (a: number, c: number) =>
 
 const INTRO = "Toca una fruta y luego una vecina para intercambiarlas.";
 
-export default function ConectaTres() {
+export default function ConectaTres({ sonido }: { sonido: boolean }) {
   // El tablero se crea en el cliente (useEffect) para evitar diferencias
   // entre servidor y navegador por el uso de números aleatorios.
   const [board, setBoard] = useState<Board>([]);
@@ -116,6 +117,7 @@ export default function ConectaTres() {
     let m: Set<number>;
     while ((m = findMatches(b)).size) {
       setClearing(m);
+      if (sonido) sonar(combo > 1 ? "combo" : "ficha");
       await sleep(250);
       const points = m.size * 10 * combo;
       gained += points;
@@ -176,8 +178,7 @@ export default function ConectaTres() {
   }
 
   return (
-    <main className={styles.wrap}>
-      <h1>🍓 Conecta Tres</h1>
+    <div className={styles.wrap}>
       <div className={styles.hud}>
         <div>
           Puntos<b>{score}</b>
@@ -210,6 +211,6 @@ export default function ConectaTres() {
       <button type="button" className={styles.new} onClick={reset}>
         Nuevo juego
       </button>
-    </main>
+    </div>
   );
 }

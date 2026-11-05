@@ -1,5 +1,5 @@
-import ConectaTres from "./components/ConectaTres";
+import Arcade from "./components/Arcade";
 
 export default function Home() {
-  return <ConectaTres />;
+  return <Arcade />;
 }
